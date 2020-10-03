@@ -1,6 +1,7 @@
 #include "external.h"
+#include "cm-sdr.h"
 
-#define DOWNSAMPLE 	32		/* decimation factor */
+//#define DOWNSAMPLE 	32		/* decimation factor */
 #define SAMPLE_SIZE   	8		/* bytes per sample */
 #define BLOCK	 	1024*1024*1 	/* number of samples per buffer */
 #define NUM_BUFS	4		/* number of buffers */
@@ -10,6 +11,10 @@
 #define IP_STACK	2
 
 /* Globals */
+cm_sdr_cfg cfg = {
+	buf: {0}
+};
+
 int* buf[NUM_BUFS];	
 int* r_sem[NUM_BUFS];	/* read ready */
 int* w_sem[NUM_BUFS];	/* write ready */
@@ -17,31 +22,6 @@ int connected = 0;	/* connection status */
 int r_index = 0;	/* current read (send) buffer */
 int w_index = 0;	/* current write buffer */
 
-/*
- * Read samples while connected
- */
-void read_data(void);
-
-/*
- * Copy the samples from the start buffer into the dest buffer, packing the I
- * and Q values into one 4 byte word and decimating.
- */
-unsigned int* compact(unsigned int* dest, unsigned int* src, unsigned int size);
-
-/*
- * Sampler thread
- */
-int sampler(void);
-
-/*
- * Network thread
- */
-int net(void);
-
-/*
- * Entrypoint
- */
-int __start(void) __attribute__((section(".start")));
 
 
 int __start(void)
@@ -49,11 +29,6 @@ int __start(void)
 	int i;
 	int res;
 	int id = 0;
-	volatile double freq = 101.0;
-
-	/* set tuner frequency */
-	tune_aux_channel(freq);
-	sleep2(10);
 
 	/* initialize buffers */
 	buf[0] = (int*) malloc(BLOCK * SAMPLE_SIZE * NUM_BUFS);
@@ -92,6 +67,7 @@ int net(void)
 	unsigned int sent = 0;
 	int* end;
 	unsigned int size;
+	int recvd = 0;
 
 	if (NULL == (sock = socket(AF_INET, 1, 6, IP_STACK)))
 		return -1;
@@ -108,6 +84,28 @@ int net(void)
 	{
 		if (NULL == (conn = accept(sock, 0, 0)))
 			return -4;
+	
+		recvd = 0;
+		while (recvd < sizeof(cfg.buf))
+		{
+			i = recv(conn, cfg.buf + recvd, sizeof(cfg.buf) - recvd, 0);
+			if (i <= 0)
+			{
+				close(conn);
+				conn = NULL;
+				break;
+			}
+			recvd += i;
+		}
+
+		if (!conn)
+			continue;
+
+		printf("freq: %08x dec: %08x\n", cfg.cfg_freq, cfg.cfg_dec);
+
+		/* set tuner frequency */
+		tune_aux_channel(double_div(int2double(cfg.cfg_freq), 1000000.0));
+		sleep2(10);
 
 		connected = 1;
 		while(connected)
@@ -251,8 +249,8 @@ unsigned int* compact(unsigned int* dest, unsigned int* src, unsigned int size)
 		 * skip samples to reduce sample rate, speed up this function,
 		 * and decrese the amount of data to send back 
 		 */
-		i += 2 * DOWNSAMPLE;
-		q += 2 * DOWNSAMPLE;
+		i += 2 * cfg.cfg_dec;
+		q += 2 * cfg.cfg_dec;
 	}
 	return p; 
 }
