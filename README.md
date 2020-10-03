@@ -33,11 +33,4 @@ cable modem model and firmware version.
 * Load binary with the provided python script `python3 upload.py`
 * Connect to modem and begin recieving data `nc 192.168.100.1 1337 > data`
 * To run FM demo, ensure numpy, scipy, and sounddevice are installed
-* Pipe data into script `nc 192.168.100.1 1337 | python3 fm-stream.py`
- 
-
-
-
-
-
-
+* Use the tune.py script and netcat to set the frequency and pipe the data into the demodulation script `python tune.py --freq 107900000 | nc 192.168.100.1 1337 | python3 fm-stream.py`

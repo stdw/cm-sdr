@@ -1,4 +1,5 @@
 import sys
+import argparse
 import time 
 import queue
 import threading
@@ -9,12 +10,19 @@ import scipy.fftpack
 import sounddevice as sd
 from scipy.io.wavfile import write
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--decimate', nargs=1, default=32, type=int, help='Decimation factor of input. Default = 32')
+parser.add_argument('--shift', nargs=1, default=0.0, type=float, help='Freqency shift in Mhz.')
+parser.add_argument('--bandwidth', nargs=1, default=200000, type=int, help='Bandwidth of channel in hertz.')
+args = parser.parse_args()
+
+
 OUT_FS = 48000      # target
 FS_STRETCH = 0.95
 SND_DEV_FS = 48000
 
-IN_FS = int(15000000 / 32)
-SHIFT = 0.097e6
+IN_FS = int(15000000 / args.decimate[0])
+SHIFT = 1.0e6 * args.shift[0]
 
 def demod(raw):
     SAMPLE_RATE = IN_FS
@@ -26,7 +34,7 @@ def demod(raw):
     data=data * np.exp(-1j*2*np.pi*SHIFT*np.arange(start=0,step=1,stop=data.size)/SAMPLE_RATE)
     
     # decimate
-    target = 200000
+    target = args.bandwidth[0]
     downsample = int(SAMPLE_RATE / target)
     
     if downsample > 1:

@@ -1,3 +1,6 @@
+#ifndef _EXTERNAL_H
+#define _EXTERNAL_H
+
 /* constants */
 #define NULL (void*) 0
 
@@ -96,6 +99,17 @@ void tune_aux_channel(double mhz_freq);
 /* misc functions */
 
 /*
+ * Convert int to double because casting results in
+ * "undefined reference to `__floatunsidf'"
+ */
+double int2double(int i);
+
+/*
+ * Divide a by b.
+ */
+double double_div(double a, double b);
+
+/*
  * Sleep for t milliseconds.
  */
 void sleep(unsigned int t);
@@ -140,3 +154,5 @@ int sem_post(int* sem);
  * Get the current count of the given semaphore.
  */
 int sem_getcount(int* sem);
+
+#endif /* _EXTERNAL_H */
