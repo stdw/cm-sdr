@@ -20,9 +20,9 @@ cable modem chip, as well as a [forum thread](https://forums.qrz.com/index.php?t
 where someone else was asking about the same thing a few years ago.
 
 The last post in the thread from user VK4HAT states:
-```
-I say if you have the skills, time and desire, give it a go and see where you end up. If google shows nothing, then its likely not been tried. With so few firsts available in life, take those that present themselves and have a crack, even if failure is always an option. 
-```
+
+> I say if you have the skills, time and desire, give it a go and see where you end up. If google shows nothing, then its likely not been tried. With so few firsts available in life, take those that present themselves and have a crack, even if failure is always an option. 
+
 So that is exactly what I did.
 
 ## Gaining Access
@@ -241,7 +241,9 @@ flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=2000 --chip W25Q32.V
 
 If that succeeds we can now dump the contents:
 ```
-flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=2000 --chip W25Q32.V --read modem.bin
+flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=2000 \
+    --chip W25Q32.V \
+    --read modem.bin
 ```
 
 ## Firmware Analysis
@@ -299,7 +301,11 @@ The layout file looks like this:
 ```
 and the command:
 ```
-flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=2000 --chip W25Q32.V --layout ./layout --image cfg --write modem-modified.bin
+flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=2000 \
+    --chip W25Q32.V \
+    --layout ./layout \
+    --image cfg \
+    --write modem-modified.bin
 ```
 
 After opening the serial console and booting again, I am greeted with... the 
@@ -482,6 +488,10 @@ presumably computes an FFT, passing in buffer address. After the computation,
 another function does some processing on the buffer, but leaves it otherwise 
 intact.
 
+| ![code snippet](./img/decompiled.png) |
+|:--:|
+| *The section of the bandpower function that samples data* |
+
 After sticking a jumper wire into the coaxial connector to act as as an 
 antenna, I called the bandpower function and then did a `read_memory` on the 
 destination buffer.
@@ -567,7 +577,16 @@ SECTIONS
 
 It is built with with the following command: 
 ```
-mips-linux-gcc measure.c -march=mips32 -mabi=eabi -msoft-float -mno-abicalls -fno-builtin -nostdlib -nodefaultlibs -nostartfiles -T ./script.ld
+mips-linux-gcc measure.c \
+    -march=mips32 \
+    -mabi=eabi \
+    -msoft-float \
+    -mno-abicalls \
+    -fno-builtin 
+    -nostdlib \
+    -nodefaultlibs \
+    -nostartfiles \
+    -T ./script.ld
 ```
 
 The MIPS CPU does not have an FPU so `-msoft-float` is used. `-mno-abicalls`
@@ -580,7 +599,12 @@ compiler from optimizing certain sections by adding calls to functions like
 Using `objcopy` we can extract just the sections we care about out of the
 compiled elf.
 ```
-mips-linux-objcopy -O binary -j .start -j .text -j .data -j .rodata a.out bin
+mips-linux-objcopy -O binary \
+    -j .start \
+    -j .text \
+    -j .data \
+    -j .rodata \
+    a.out bin
 ```
 
 And finally, to actually load it I wrote a Python script that uses pexpect to
@@ -675,6 +699,8 @@ radio fairly seamlessly, although the audio has to be slowed down slightly
 so it is not consumed faster than it is being recieved. I have also been able 
 to be recieved. I have also been able to pick up the 154MHz narrowband FM radio
 used by the local fire department. 
+
+[Here is a short sample of some demodulated audio captured with the modem](./img/sample.wav)
 
 ## Conclusion
 
