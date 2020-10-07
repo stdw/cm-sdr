@@ -5,12 +5,12 @@ typedef union {
 	char buf[sizeof(unsigned int)*2];
 	struct {
 		unsigned int _freq;
-		unsigned int _dec;
+		unsigned int _downsample;
 	} __attribute__((packed)) cfg;
 } cm_sdr_cfg;
 
 #define cfg_freq cfg._freq
-#define cfg_dec  cfg._dec
+#define cfg_downsample  cfg._downsample
 
 
 /*

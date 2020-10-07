@@ -1,16 +1,17 @@
 #include "external.h"
 #include "cm-sdr.h"
 
-//#define DOWNSAMPLE 	32		/* decimation factor */
 #define SAMPLE_SIZE   	8		/* bytes per sample */
-#define BLOCK	 	1024*1024*1 	/* number of samples per buffer */
-#define NUM_BUFS	4		/* number of buffers */
+#define BLOCK	 	1024*1024*2 	/* number of samples per buffer */
+#define NUM_BUFS	3		/* number of buffers */
 
 #define BIND_ADDR 	0xc0a86401	/* 192.168.100.1 */
 #define PORT		1337		/* listen port */
 #define IP_STACK	2
 
 /* Globals */
+
+/* holds frequency and downsampling factor */
 cm_sdr_cfg cfg = {
 	buf: {0}
 };
@@ -100,8 +101,6 @@ int net(void)
 
 		if (!conn)
 			continue;
-
-		printf("freq: %08x dec: %08x\n", cfg.cfg_freq, cfg.cfg_dec);
 
 		/* set tuner frequency */
 		tune_aux_channel(double_div(int2double(cfg.cfg_freq), 1000000.0));
@@ -249,8 +248,8 @@ unsigned int* compact(unsigned int* dest, unsigned int* src, unsigned int size)
 		 * skip samples to reduce sample rate, speed up this function,
 		 * and decrese the amount of data to send back 
 		 */
-		i += 2 * cfg.cfg_dec;
-		q += 2 * cfg.cfg_dec;
+		i += 2 * cfg.cfg_downsample;
+		q += 2 * cfg.cfg_downsample;
 	}
 	return p; 
 }

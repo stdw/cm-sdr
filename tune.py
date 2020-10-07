@@ -4,9 +4,9 @@ import struct
 import sys
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--freq', nargs=1, type=int, required=True, help='Tuner center frequency in hertz')
-parser.add_argument('--decimate', nargs=1, default=32, type=int, help='Decimation factor. Default = 32')
+parser.add_argument('--freq', type=int, required=True, help='Tuner center frequency in hertz')
+parser.add_argument('--downsample', type=int, default=32, help='Downsampling factor. Default = 32')
 args = parser.parse_args()
 
-cfg = struct.pack('>II', args.freq[0], args.decimate[0])
+cfg = struct.pack('>II', args.freq, args.downsample)
 sys.stdout.buffer.write(cfg)
