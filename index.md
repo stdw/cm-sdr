@@ -10,8 +10,9 @@ a web forum where people were discussing the built in spectrum analyzer feature
 used for diagnostics. Someone mentioned that they could see spikes
 corresponding to FM radio stations. This sparked a thought: if a cable modem 
 and a digital TV tuner dongle are fundamentally doing the same thing (receiving 
-and demodulating QAM signals), could a modem be turned into an SDR a la 
-[RTL-SDR](https://www.rtl-sdr.com/)?
+and demodulating QAM signals), could a modem be turned into an 
+[SDR (software-defined radio)](https://en.wikipedia.org/wiki/Software-defined_radio)
+a la [RTL-SDR](https://www.rtl-sdr.com/)?
 
 Going into this project, I knew next to nothing about RF and had no idea if
 this goal was even feasible at all for the hardware. I found 
