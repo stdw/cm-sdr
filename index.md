@@ -488,10 +488,6 @@ presumably computes an FFT, passing in buffer address. After the computation,
 another function does some processing on the buffer, but leaves it otherwise 
 intact.
 
-| ![code snippet](./img/decompiled.png) |
-|:--:|
-| *The section of the bandpower function that samples data* |
-
 After sticking a jumper wire into the coaxial connector to act as as an 
 antenna, I called the bandpower function and then did a `read_memory` on the 
 destination buffer.
