@@ -9,7 +9,7 @@ and if it was running Linux. Some quick searching brought me to a thread on
 a web forum where people were discussing the built in spectrum analyzer feature
 used for diagnostics. Someone mentioned that they could see spikes
 corresponding to FM radio stations. This sparked a thought: if a cable modem 
-and a digital TV tuner dongle are fundamentally doing the same thing (recieving 
+and a digital TV tuner dongle are fundamentally doing the same thing (receiving 
 and demodulating QAM signals), could a modem be turned into an SDR a la 
 [RTL-SDR](https://www.rtl-sdr.com/)?
 
