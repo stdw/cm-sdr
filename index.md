@@ -11,13 +11,13 @@ used for diagnostics. Someone mentioned that they could see spikes
 corresponding to FM radio stations. This sparked a thought: if a cable modem 
 and a digital TV tuner dongle are fundamentally doing the same thing (recieving 
 and demodulating QAM signals), could a modem be turned into an SDR a la 
-(RTL-SDR)[https://www.rtl-sdr.com/]?
+[RTL-SDR](https://www.rtl-sdr.com/)?
 
 Going into this project, I knew next to nothing about RF and had no idea if
 this goal was even feasible at all for the hardware. I found 
-(one SDR project)[http://www.hermeslite.com] based on an Analog Devices 
+[an SDR project](http://www.hermeslite.com) based on an Analog Devices 
 cable modem chip, as well as a [forum thread](https://forums.qrz.com/index.php?threads/cable-modem-to-software-defined-radio-modification-projects.512433/)
-where someone else was asking about the same thing a few years ago.
+where someone else was wondering about the same thing a few years ago.
 
 The last post in the thread from user VK4HAT states:
 
@@ -55,7 +55,7 @@ of the time anyway.
 There are a few reasons why the Raspberry Pi is not the best serial interface
 such as if you need parity or other features, but in this case I had it on hand
 and it works. The serial console of the Pi must also be disabled so that it can 
-be used as a generic serial port. There is another reason I chose to use the 
+be freed up for other purposes. There is another reason I chose to use the 
 Raspberry Pi which I will get to later.
 
 Finally, to actually see the data I used the `cu` utility:  
@@ -231,12 +231,13 @@ the flashrom wiki shows the size and voltage match what is expected and that
 the chip is fully supported.
 
 Before proceeding, ensure that the SPI interface on the Pi is enabled by
-using the `raspi-config` utility and checking under `Interfacing Options`.
+using the `raspi-config` utility and checking under "Interfacing Options".
 
 At last we can read the chip. First verify that it is detected and everything is
 wired correctly:
 ```
-flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=2000 --chip W25Q32.V
+flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=2000 \
+    --chip W25Q32.V
 ``` 
 
 If that succeeds we can now dump the contents:
@@ -291,7 +292,7 @@ Next, I appended the modified configuration onto a file padded with zeros up
 to the appropriate offset and used `flashrom` to write the configuration back
 to the chip.
  
-To reduce the chance of an error, I created a layout file for `flashrom` so it
+To avoid rewriting the entire chip, I created a layout file for `flashrom` so it
 would only overwrite the configuration rather than the entire contents which is
 why the modified image is just padded with zeros.
 The layout file looks like this:
@@ -415,7 +416,7 @@ there a lot of debug strings that makes some functions very easy to identify.
 I started naming any functions I came across using the strings as well as
 the function signature in combination with the context it is used and any
 cross references. Eventually, when ending up in an unknown function, the cross
-references to named functions give some clue as the the context of the function
+references to named functions give some clue as to the context of the function
 eventually making things a little easier.
 
 For the most part, I was just searching interesting strings such as "tuner" and
@@ -513,7 +514,7 @@ CM> read_memory -n256 0x86fb3e80
 86fb3f70: 00 1f fd 93  00 3f ff 4d  00 1f fa ee  00 3f fe 16 | .....?.M.....?..
 ```
 
-My hope was that this was (I/Q)[http://www.ni.com/tutorial/4805/en/] data and 
+My hope was that this was [I/Q](http://www.ni.com/tutorial/4805/en/) data and 
 this certainly looked promising. This was supported by the function that 
 processes the data after the FFT - it checks if the 0x00200000 bit is zero on 
 the first 32-bit word, and if so drops the first and last word of data. 
@@ -701,5 +702,9 @@ used by the local fire department.
 ## Conclusion
 
 Although this project was mostly just a challenge to myself and is not intended
-as a serious SDR, I am pleased with the results and hope to continue to improve 
-it.
+as a serious SDR, I am satisfied with the results and hope to continue to 
+improve it.
+
+This quote really resonated with me, so once again in the words of VK4HAT, "With so few firsts available in life, take those that present themselves and have a crack"
+
+[cm-sdr repo on GitHub](https://github.com/stdw/cm-sdr)
