@@ -573,7 +573,7 @@ SECTIONS
 }
 ```
 
-It is built with with the following command: 
+It is built with the following command: 
 ```
 mips-linux-gcc measure.c \
     -march=mips32 \
